@@ -1,0 +1,6 @@
+#env files 
+*.env
+
+#venv 
+venv_receipt_2_excel
+venv/
