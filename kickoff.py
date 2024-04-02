@@ -1,22 +1,23 @@
 from utilities import load_environment_variables
 from processing import encode64, parse_receipt_to_json
-from data_access import get_image_paths, get_topHeadings
+from data_access import get_topHeadings
 from output import create_excel_sheet
 from openai import OpenAI
 import os 
 
-def run():
+def run(uploaded_files, temp_file_path):
   print('starting kickoff')
-
+  print(uploaded_files)
   #load environment variables
   load_environment_variables()
   OpenAI.api_key = os.getenv('OPENAI_API_KEY')
   client = OpenAI()
+  
   processed_images = []
-  #process links 
-  urls = get_image_paths()
-  for link in urls:
-    processed_img = encode64(link)
+  #process files 
+  for file in uploaded_files:
+    print(f'processing {file}')
+    processed_img = encode64(file)
     processed_images.append(processed_img)  
 
   print('extracting text..')
@@ -49,31 +50,34 @@ def run():
     )
     extracted_text = response.choices[0].message.content
     extracted_texts.append(extracted_text)
-
+  print('extracted text')
+  print(extracted_text)
   #combine all texts 
   combined_text = "\n".join(extracted_texts)
+  print(f"COMBINED TEXT: {combined_text}")
   topHeadings = get_topHeadings()
   #refining prompt 
   message_obj = [{
         "role": "system",
-        "content": f"""You are developing an expense tracker that processes text blocks containing receipt details. Your task is to extract each item's name and price, then categorize each item according to a predefined list of expense categories.
-                    Each item will most likely be abberviated. When categorizing, it is a good idea to guess the category based on the brand of the product (if possible). If the category remains unclear, default to placing the item under 'Groceries & Food'
-                    It's critical to accurately extract and categorize every item listed in the receipts without adding or omitting any details. Misinterpretation or addition of numbers is not acceptable.
-                    The output should be a cleanly formatted list, categorized by expense type, with each item and its price listed underneath the relevant category heading. Do not include any additional text or explanation outside of this structured format.
-                    
-                    Sometimes, the receipt itmes will be split into multiple boxes. Please ensure you get every item on each receipt that is given. 
-                    Categories can be found here ```{topHeadings}```
+        "content": f"""
+          You are developing an expense tracker that processes text blocks containing receipt details. Your task is to extract each item's name and price, then categorize each item according to a predefined list of expense categories.
+          Each item will most likely be abberviated. When categorizing, it is a good idea to guess the category based on the brand of the product (if possible). If the category remains unclear, default to placing the item under 'Groceries & Food'
+          It's critical to accurately extract and categorize every item listed in the receipts without adding or omitting any details. Misinterpretation or addition of numbers is not acceptable.
+          The output should be a cleanly formatted list, categorized by expense type, with each item and its price listed underneath the relevant category heading. Do not include any additional text or explanation outside of this structured format.
+          
+          Sometimes, the receipt itmes will be split into multiple boxes. Please ensure you get every item on each receipt that is given. 
+          Categories can be found here ```{topHeadings}```
 
-                    Your output should resemble the following structure, strictly adhering to these categories and format:
-                    ````
-                    Groceries & Food
-                      ORG SUGAR, 4.99
-                      DC FIGS, 2.99
-                    Electronics & Appliances
+          Your output should resemble the following structure, strictly adhering to these categories and format:
+          ````
+          Groceries & Food
+            ORG SUGAR, 4.99
+            DC FIGS, 2.99
+          Electronics & Appliances
 
-                    Home & Living
-                    ````
-                    Ensure the returned file strictly follows this format, with items and categories correctly placed based on the receipt(s) provided. Make sure not to hallucinate any values or items.
+          Home & Living
+          ````
+          Ensure the returned file strictly follows this format, with items and categories correctly placed based on the receipt(s) provided. Make sure not to hallucinate any values or items.
 
           """
       },
@@ -85,11 +89,11 @@ def run():
   print('refining output..')
   #refine output
   response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
+    model="gpt-4",
     messages=message_obj,
   )
   msg = response.choices[0].message.content
   json_response = (parse_receipt_to_json(msg))
   print("CREATING EXCEL FILE")
-  create_excel_sheet(json_response)
-
+  excel_sheet = create_excel_sheet(json_response, temp_file_path)
+  return excel_sheet

@@ -66,8 +66,5 @@ Clothing & Accessories
 Health & Beauty
 """
 
-def get_image_paths():
-    return image_paths
-
 def get_topHeadings():
     return topHeadings
