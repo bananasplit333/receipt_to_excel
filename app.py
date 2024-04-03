@@ -1,12 +1,13 @@
 import tempfile
 from flask import Flask, request, send_file
 import kickoff
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, support_credentials=True)
 
 @app.route('/process-receipts', methods=['POST', 'OPTIONS'])
+@cross_origin(supports_credentials=True)
 def process_receipts():
     if request.method == 'OPTIONS':
         # Preflight request. Reply successfully:
@@ -16,7 +17,7 @@ def process_receipts():
             mimetype='application/json'
         )
         return response
-
+    
     # Get the uploaded image files
     uploaded_files = request.files.getlist('images')
     print(f"Received {len(uploaded_files)} files")
