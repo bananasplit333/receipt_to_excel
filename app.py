@@ -23,5 +23,11 @@ def process_receipts():
             return send_file(temp_file_path, as_attachment=True, download_name='expense_tracker.xlsx')
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/')
+def hello_world():
+    return "Hello WORLD"
+
 if __name__ == '__main__':
     app.run(debug=True)
