@@ -1,23 +1,22 @@
 import tempfile
 from flask import Flask, request, send_file
 import kickoff
-from flask_cors import cross_origin, CORS
+from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
-@app.after_request
-def add_cors_headers(response):
-    # Allow access from any origin
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    # Specify the allowed methods
-    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    # Specify the allowed headers
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-    return response
-
-@app.route('/process-receipts', methods=['POST'])
+@app.route('/process-receipts', methods=['POST', 'OPTIONS'])
 def process_receipts():
+    if request.method == 'OPTIONS':
+        # Preflight request. Reply successfully:
+        response = app.response_class(
+            response='',
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+
     # Get the uploaded image files
     uploaded_files = request.files.getlist('images')
     print(f"Received {len(uploaded_files)} files")
@@ -30,7 +29,11 @@ def process_receipts():
         kickoff.run(uploaded_files, temp_file_path)
 
         # Send the file
-        return send_file(temp_file_path, as_attachment=True, download_name='expense_tracker.xlsx')
+        response = send_file(temp_file_path, as_attachment=True, download_name='expense_tracker.xlsx')
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'POST'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+        return response
 
 if __name__ == '__main__':
     app.run(debug=True)
