@@ -1,25 +1,25 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "*.py",
-        "use": "@vercel/python"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/api/process-receipts",
-        "dest": "app.py",
-        "methods": ["POST"]
-      },
-      {
-        "src": "/api/generate-report",
-        "dest": "app.py",
-        "methods": ["GET"]
-      },
-      {
-        "src": "/(.*)",
-        "dest": "app.py"
-      }
-    ]
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "**/*.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/process-receipts",
+      "dest": "app.py",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/api/generate-report",
+      "dest": "app.py",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
+  ]
+}
