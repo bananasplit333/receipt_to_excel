@@ -6,6 +6,14 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/')
+def home():
+    return jsonify({'message': 'Welcome to the Receipt Processing API'})
+
+@app.route('/test')
+def test_endpoint():
+    return jsonify({'message': 'Test endpoint is working'})
+
 @app.route('/process-receipts', methods=['POST'])
 def process_receipts():
     try:
@@ -23,11 +31,6 @@ def process_receipts():
             return send_file(temp_file_path, as_attachment=True, download_name='expense_tracker.xlsx')
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-
-@app.route('/')
-def hello_world():
-    return "Hello WORLD"
 
 if __name__ == '__main__':
     app.run(debug=True)
