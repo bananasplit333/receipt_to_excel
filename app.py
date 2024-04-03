@@ -8,7 +8,8 @@ CORS(app)
 
 @app.route('/')
 def home():
-    return jsonify({'message': 'Welcome to the Receipt Processing API'})
+     message = 'Welcome to the Receipt Processing API'
+     return jsonify({'message': message}), 200, {'Content-Type': 'application/json; charset=utf-8'}, f"<h1>{message}</h1>"
 
 @app.route('/test')
 def test_endpoint():
@@ -34,3 +35,8 @@ def process_receipts():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+"""
+
+"""
