@@ -1,10 +1,43 @@
-import tempfile
-from flask import Flask, request, send_file
-import kickoff
-from flask_cors import CORS, cross_origin
+
+from flask import Flask, request, send_file, jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+
+
+@app.route('/process-receipts', methods=['POST', 'OPTIONS'])
+def process_receipts():
+    if request.method == 'OPTIONS':
+        # Preflight request. Reply successfully:
+        response = app.response_class(
+            response='',
+            status=200,
+            mimetype='application/json'
+        )
+        return response
+
+    # Check for authentication
+    auth = request.authorization
+    if not auth or not authenticate(auth.username, auth.password):
+        response = jsonify({'message': 'Authentication required'})
+        response.status_code = 401
+        response.headers['WWW-Authenticate'] = 'Basic realm="Receipt Processing"'
+        return response
+
+    # Rest of the code for processing receipts...
+
+def authenticate(username, password):
+    # Replace this with your actual authentication logic
+    return username == 'admin' and password == 'secret'
+
+if __name__ == '__main__':
+    app.run(debug=True)
+app = Flask(__name__)
 CORS(app, support_credentials=True)
+
+
+"""
 
 @app.route('/process-receipts', methods=['POST', 'OPTIONS'])
 @cross_origin(supports_credentials=True)
@@ -38,3 +71,4 @@ def process_receipts():
 
 if __name__ == '__main__':
     app.run(debug=True)
+"""
