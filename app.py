@@ -1,15 +1,27 @@
 import tempfile
-from flask import Flask, request, send_file, jsonify
+from flask import Flask, render_template_string, request, send_file, jsonify
 import kickoff
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
+
 @app.route('/')
 def home():
-     message = 'Welcome to the Receipt Processing API'
-     return jsonify({'message': message}), 200, {'Content-Type': 'application/json; charset=utf-8'}, f"<h1>{message}</h1>"
+    message = 'Welcome to the Receipt Processing API'
+    return render_template_string(f"""
+        <html>
+            <head>
+                <title>Receipt Processing API</title>
+            </head>
+            <body>
+                <h1>{message}</h1>
+                <p>JSON Response: {{{{ message | tojson }}}}</p>
+            </body>
+        </html>
+    """, message=message)
+
 
 @app.route('/test')
 def test_endpoint():
