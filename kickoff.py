@@ -3,6 +3,7 @@ from processing import encode64, parse_receipt_to_json
 from data_access import get_topHeadings
 from output import create_excel_sheet
 from openai import OpenAI
+from groq import Groq
 import os 
 
 def run(uploaded_files, temp_file_path):
@@ -11,7 +12,9 @@ def run(uploaded_files, temp_file_path):
   #load environment variables
   load_environment_variables()
   OpenAI.api_key = os.getenv('OPENAI_API_KEY')
+  Groq.api_key = os.getenv('GROQ_API_KEY')
   client = OpenAI()
+  groq_client = Groq()
   
   processed_images = []
   #process files 
@@ -88,8 +91,8 @@ def run(uploaded_files, temp_file_path):
   print('extraction successful')
   print('refining output..')
   #refine output
-  response = client.chat.completions.create(
-    model="gpt-4",
+  response = groq_client.chat.completions.create(
+    model="llama3-70b-8192",
     messages=message_obj,
   )
   msg = response.choices[0].message.content
@@ -97,3 +100,5 @@ def run(uploaded_files, temp_file_path):
   print("CREATING EXCEL FILE")
   excel_sheet = create_excel_sheet(json_response, temp_file_path)
   return excel_sheet
+
+
