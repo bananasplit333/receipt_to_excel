@@ -4,3 +4,7 @@
 #venv 
 venv_receipt_2_excel
 venv/
+
+#env
+receipt_to_excel_env
+env/

@@ -1,60 +1,92 @@
 from utilities import load_environment_variables
 from processing import encode64, parse_receipt_to_json
 from data_access import get_topHeadings
-from output import create_excel_sheet
 from openai import OpenAI
 from groq import Groq
+from anthropic import Anthropic
 import os 
+import base64
 
-def run(uploaded_files, temp_file_path):
+def run(uploaded_file, temp_file_path):
   print('starting kickoff')
-  print(uploaded_files)
   #load environment variables
   load_environment_variables()
   OpenAI.api_key = os.getenv('OPENAI_API_KEY')
   Groq.api_key = os.getenv('GROQ_API_KEY')
   client = OpenAI()
+  claude_client = Anthropic()
   groq_client = Groq()
   
   processed_images = []
-  #process files 
-  for file in uploaded_files:
-    print(f'processing {file}')
-    processed_img = encode64(file)
-    processed_images.append(processed_img)  
+  # Process the uploaded file
+  print(f'processing {uploaded_file}')
+  img_data = uploaded_file.read()
+  processed_img = base64.b64encode(img_data).decode('utf-8')
+
 
   print('extracting text..')
   #use vision to extract all text from images 
   extracted_texts = []
-  for img in processed_images:
-    response = client.chat.completions.create(
-      model="gpt-4-vision-preview",
-      messages=[
+  
+  ##gpt 4 vision 
+  response = client.chat.completions.create(
+    
+    model="gpt-4-vision-preview",
+    messages=[
+      {
+        "role":"user",
+        "content": [
+          {
+            "type": "text",
+            "text": """As an AI, you are an unbiased evaluator tasked with analyzing images of receipts. 
+            You use your built-in computer vision to perform careful image analysis in performing this automated task. 
+            Your primary goal is to take advantage of your vision to translate the receipt into text. 
+            
+            Do not provide any clarifying explanations, or any perfunctory messages. Ensure to add duplicates should there be any on the receipt.
+            """
+          }, 
+          {
+            "type": "image_url",
+            "image_url": {"url" : f"data:image/jpeg;base64,{processed_img}"},
+          },
+        ],
+      },
+    ],
+    max_tokens = 4096,
+  )
+  
+  print('hi')
+  '''
+  message = claude_client.messages.create(
+    model="claude-3-opus-20240229",
+    max_tokens=1024,
+    messages=[
         {
-          "role":"user",
-          "content": [
-            {
-              "type": "text",
-              "text": """As an AI, you are an unbiased evaluator tasked with analyzing images of receipts. 
-              You use your built-in computer vision to perform careful image analysis in performing this automated task. 
-              Your primary goal is to take advantage of your vision to translate the receipt into text. 
-              
-              Do not provide any clarifying explanations, or any perfunctory messages. Ensure to add duplicates should there be any on the receipt.
-              """
-            }, 
-            {
-              "type": "image_url",
-              "image_url": {"url" : f"data:image/jpeg;base64,{img}"},
-            },
-          ],
-        },
-      ],
-      max_tokens = 4096,
-    )
-    extracted_text = response.choices[0].message.content
-    extracted_texts.append(extracted_text)
+            "role": "user",
+            "content": [
+                {
+                    "type": "url",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": {processed_img}
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "translate the receipt into text."
+                }
+            ]
+        }
+    ]
+  )
+
+  
+  print(message)
+  '''
+  extracted_text = response.choices[0].message.content
+  extracted_texts.append(extracted_text)
   print('extracted text')
-  print(extracted_text)
   #combine all texts 
   combined_text = "\n".join(extracted_texts)
   print(f"COMBINED TEXT: {combined_text}")
@@ -98,7 +130,11 @@ def run(uploaded_files, temp_file_path):
   msg = response.choices[0].message.content
   json_response = (parse_receipt_to_json(msg))
   print("CREATING EXCEL FILE")
+  print(json_response)
+
+
+  """
   excel_sheet = create_excel_sheet(json_response, temp_file_path)
   return excel_sheet
-
+  """ 
 
