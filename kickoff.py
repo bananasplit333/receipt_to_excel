@@ -1,5 +1,6 @@
 from utilities import load_environment_variables
 from processing import encode64, parse_receipt_to_json
+import time 
 from data_access import get_topHeadings
 from openai import OpenAI
 from groq import Groq
@@ -28,6 +29,7 @@ def run(uploaded_file, temp_file_path):
   #use vision to extract all text from images 
   extracted_texts = []
   
+  gpt_time = time.time() 
   ##gpt 4 vision 
   response = client.chat.completions.create(
     
@@ -45,7 +47,7 @@ def run(uploaded_file, temp_file_path):
             Do not provide any clarifying explanations, or any perfunctory messages. Ensure to add duplicates should there be any on the receipt.
             """
           }, 
-          {
+          { 
             "type": "image_url",
             "image_url": {"url" : f"data:image/jpeg;base64,{processed_img}"},
           },
@@ -54,9 +56,13 @@ def run(uploaded_file, temp_file_path):
     ],
     max_tokens = 4096,
   )
+  gpt_end_time = time.time() 
+  gpt_t = gpt_end_time - gpt_time 
+  print(f"GPT TOTAL TIME : {gpt_t}")
   
-  print('hi')
-  '''
+  print('starting claude..')
+  start_time = time.time() 
+  #claude vision 
   message = claude_client.messages.create(
     model="claude-3-opus-20240229",
     max_tokens=1024,
@@ -80,10 +86,11 @@ def run(uploaded_file, temp_file_path):
         }
     ]
   )
-
-  
+  end_time = time.time() 
+  claude_t = end_time - start_time
+  print(f"CLAUDE TOTAL TIME: {claude_t}")
   print(message)
-  '''
+  
   extracted_text = response.choices[0].message.content
   extracted_texts.append(extracted_text)
   print('extracted text')
