@@ -15,7 +15,6 @@ def run(uploaded_file, temp_file_path):
   OpenAI.api_key = os.getenv('OPENAI_API_KEY')
   Groq.api_key = os.getenv('GROQ_API_KEY')
   client = OpenAI()
-  claude_client = Anthropic()
   groq_client = Groq()
   
   processed_images = []
@@ -28,7 +27,6 @@ def run(uploaded_file, temp_file_path):
   print('extracting text..')
   #use vision to extract all text from images 
   extracted_texts = []
-  
   gpt_time = time.time() 
   ##gpt 4 vision 
   response = client.chat.completions.create(
@@ -59,38 +57,7 @@ def run(uploaded_file, temp_file_path):
   gpt_end_time = time.time() 
   gpt_t = gpt_end_time - gpt_time 
   print(f"GPT TOTAL TIME : {gpt_t}")
-  
-  print('starting claude..')
-  start_time = time.time() 
-  #claude vision 
-  message = claude_client.messages.create(
-    model="claude-3-opus-20240229",
-    max_tokens=1024,
-    messages=[
-        {
-            "role": "user",
-            "content": [
-                {
-                    "type": "url",
-                    "source": {
-                        "type": "base64",
-                        "media_type": "image/jpeg",
-                        "data": {processed_img}
-                    }
-                },
-                {
-                    "type": "text",
-                    "text": "translate the receipt into text."
-                }
-            ]
-        }
-    ]
-  )
-  end_time = time.time() 
-  claude_t = end_time - start_time
-  print(f"CLAUDE TOTAL TIME: {claude_t}")
-  print(message)
-  
+
   extracted_text = response.choices[0].message.content
   extracted_texts.append(extracted_text)
   print('extracted text')
