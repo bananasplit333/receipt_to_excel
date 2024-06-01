@@ -4,7 +4,6 @@ import time
 from data_access import get_topHeadings
 from openai import OpenAI
 from groq import Groq
-from anthropic import Anthropic
 import os 
 import base64
 
@@ -27,7 +26,7 @@ def run(uploaded_file, temp_file_path):
   print('extracting text..')
   #use vision to extract all text from images 
   extracted_texts = []
-<<<<<<< HEAD
+
   for img in processed_images:
     response = client.chat.completions.create(
       model="gpt-4o",
@@ -55,7 +54,7 @@ def run(uploaded_file, temp_file_path):
     )
     extracted_text = response.choices[0].message.content
     extracted_texts.append(extracted_text)
-=======
+
   gpt_time = time.time() 
   ##gpt 4 vision 
   response = client.chat.completions.create(
@@ -89,7 +88,7 @@ def run(uploaded_file, temp_file_path):
 
   extracted_text = response.choices[0].message.content
   extracted_texts.append(extracted_text)
->>>>>>> 320c0667e28ccb0e92b4bcc8b9f6b1375f25e010
+
   print('extracted text')
   #combine all texts 
   combined_text = "\n".join(extracted_texts)
