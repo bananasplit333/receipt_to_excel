@@ -28,7 +28,7 @@ def run(uploaded_files, temp_file_path):
   extracted_texts = []
   for img in processed_images:
     response = client.chat.completions.create(
-      model="gpt-4-vision-preview",
+      model="gpt-4o",
       messages=[
         {
           "role":"user",
@@ -81,7 +81,7 @@ def run(uploaded_files, temp_file_path):
           Home & Living
           ````
           Ensure the returned file strictly follows this format, with items and categories correctly placed based on the receipt(s) provided. Make sure not to hallucinate any values or items.
-
+          Return the result in JSON format.
           """
       },
       {
@@ -91,12 +91,15 @@ def run(uploaded_files, temp_file_path):
   print('extraction successful')
   print('refining output..')
   #refine output
-  response = groq_client.chat.completions.create(
-    model="llama3-70b-8192",
+  response = client.chat.completions.create(
+    model="gpt-4o",
+    response_format={"type": "json_object"},
     messages=message_obj,
   )
   msg = response.choices[0].message.content
-  json_response = (parse_receipt_to_json(msg))
+  print(msg)
+  #json_response = (parse_receipt_to_json(msg))
+  return msg 
   print("CREATING EXCEL FILE")
   excel_sheet = create_excel_sheet(json_response, temp_file_path)
   return excel_sheet

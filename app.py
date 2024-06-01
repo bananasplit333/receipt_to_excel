@@ -38,17 +38,12 @@ def process_receipts():
         with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as temp_file:
             temp_file_path = temp_file.name
             # Call the existing functions from kickoff.py
-            kickoff.run(uploaded_files, temp_file_path)
+            json_response = kickoff.run(uploaded_files, temp_file_path)
 
-            # Send the file
-            return send_file(temp_file_path, as_attachment=True, download_name='expense_tracker.xlsx')
+            #send back json file 
+            return jsonify(json_response)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-"""
-
-"""
