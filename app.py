@@ -31,9 +31,8 @@ def test_endpoint():
 def process_receipts():
     try:
         # Get the uploaded image files
-        uploaded_files = request.files.getlist('images')
-        print(f"Received {len(uploaded_files)} files")
-
+        uploaded_files = request.files.get('image')   
+        print(f"Received {(uploaded_files)}")
         # Create a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as temp_file:
             temp_file_path = temp_file.name
