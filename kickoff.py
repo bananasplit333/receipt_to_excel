@@ -108,12 +108,15 @@ def run(uploaded_file, temp_file_path):
 
           Your output should resemble the following structure, strictly adhering to these categories and format:
           ````
-          Groceries & Food
-            ORG SUGAR, 4.99
-            DC FIGS, 2.99
-          Electronics & Appliances
-
-          Home & Living
+          Item: 
+            Groceries & Food
+              ORG SUGAR, 4.99
+              DC FIGS, 2.99
+            Electronics & Appliances
+            Home & Living
+          Store: Costco
+          Tax: 4.20
+          Total Cost: 50.00
           ````
           Ensure the returned file strictly follows this format, with items and categories correctly placed based on the receipt(s) provided. Make sure not to hallucinate any values or items.
           Return the result in JSON format.
