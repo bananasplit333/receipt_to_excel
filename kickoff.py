@@ -14,9 +14,9 @@ def run(uploaded_file, temp_file_path):
   OpenAI.api_key = os.getenv('OPENAI_API_KEY')
   Groq.api_key = os.getenv('GROQ_API_KEY')
   client = OpenAI()
-  groq_client = Groq()
+  #groq_client = Groq()
   
-  processed_images = []
+  #processed_images = []
   # Process the uploaded file
   print(f'processing {uploaded_file}')
   img_data = uploaded_file.read()
@@ -26,7 +26,7 @@ def run(uploaded_file, temp_file_path):
   print('extracting text..')
   #use vision to extract all text from images 
   extracted_texts = []
-
+  '''
   for img in processed_images:
     response = client.chat.completions.create(
       model="gpt-4o",
@@ -54,12 +54,11 @@ def run(uploaded_file, temp_file_path):
     )
     extracted_text = response.choices[0].message.content
     extracted_texts.append(extracted_text)
-
-  gpt_time = time.time() 
+  '''
   ##gpt 4 vision 
   response = client.chat.completions.create(
     
-    model="gpt-4-vision-preview",
+    model="gpt-4o",
     messages=[
       {
         "role":"user",
@@ -82,13 +81,10 @@ def run(uploaded_file, temp_file_path):
     ],
     max_tokens = 4096,
   )
-  gpt_end_time = time.time() 
-  gpt_t = gpt_end_time - gpt_time 
-  print(f"GPT TOTAL TIME : {gpt_t}")
 
   extracted_text = response.choices[0].message.content
   extracted_texts.append(extracted_text)
-
+  
   print('extracted text')
   #combine all texts 
   combined_text = "\n".join(extracted_texts)
@@ -98,7 +94,11 @@ def run(uploaded_file, temp_file_path):
   message_obj = [{
         "role": "system",
         "content": f"""
-          You are developing an expense tracker that processes text blocks containing receipt details. Your task is to extract each item's name and price, then categorize each item according to a predefined list of expense categories.
+          You are developing an expense tracker that processes text blocks containing receipt details. Your task is to :
+          1. extract each item's name and price, then categorize each item according to a predefined list of expense categories.
+          2. identify the store that the photo belongs to - ie. Costco, Shoppers, etc.
+          3. Display the tax 
+          4. Display total cost 
           Each item will most likely be abberviated. When categorizing, it is a good idea to guess the category based on the brand of the product (if possible). If the category remains unclear, default to placing the item under 'Groceries & Food'
           It's critical to accurately extract and categorize every item listed in the receipts without adding or omitting any details. Misinterpretation or addition of numbers is not acceptable.
           The output should be a cleanly formatted list, categorized by expense type, with each item and its price listed underneath the relevant category heading. Do not include any additional text or explanation outside of this structured format.
