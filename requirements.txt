@@ -1,6 +1,4 @@
-flask
-flask-cors
-openai
-xlsxwriter
-python-dotenv
-base64
+Flask==3.0.3
+Flask-Cors==4.0.1
+openai==1.34.0
+python-dotenv==1.0.1

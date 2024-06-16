@@ -3,7 +3,7 @@ from processing import encode64, parse_receipt_to_json
 import time 
 from data_access import get_topHeadings
 from openai import OpenAI
-from groq import Groq
+# from groq import Groq
 import os 
 import base64
 
@@ -12,7 +12,7 @@ def run(uploaded_file, temp_file_path):
   #load environment variables
   load_environment_variables()
   OpenAI.api_key = os.getenv('OPENAI_API_KEY')
-  Groq.api_key = os.getenv('GROQ_API_KEY')
+  #Groq.api_key = os.getenv('GROQ_API_KEY')
   client = OpenAI()
   #groq_client = Groq()
   
