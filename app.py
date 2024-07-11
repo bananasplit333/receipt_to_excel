@@ -23,10 +23,6 @@ def home():
     """, message=message)
 
 
-@app.route('/test')
-def test_endpoint():
-    return jsonify({'message': 'Test endpoint is working'})
-
 @app.route('/process-receipts', methods=['POST'])
 def process_receipts():
     try:
@@ -37,12 +33,24 @@ def process_receipts():
         with tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx') as temp_file:
             temp_file_path = temp_file.name
             # Call the existing functions from kickoff.py
-            json_response = kickoff.run(uploaded_files, temp_file_path)
+            json_response = kickoff.run(uploaded_files, temp_file_path, 'receipt')
 
             #send back json file 
             return jsonify(json_response)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/process-invoice', methods=['POST'])
+def process_bills():
+    try: 
+        #get uploaded image files 
+        uploaded_files = request.files.get('image')
+        print(f"Received {uploaded_files}")
+        json_response = kickoff.run(uploaded_files, 'hi', 'invoice')
+
+        #send back json file
+        return jsonify(json_response)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5055)
