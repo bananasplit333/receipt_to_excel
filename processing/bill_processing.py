@@ -1,17 +1,20 @@
 from utilities.openai_client import client 
+from data_access.data_manager import get_bill_categories
 
 def process_bills(input):
+    bill_categories = get_bill_categories()
     message = [{
         "role": "system",
         "content": f"""
           You are developing an expense tracker that processes invoices. Your task is to :
           1. extract each item/service name and price
-          2. identify the person or company that the invoice is coming from (ie. Gerard Howards, octagon legal group, etc. If you are given both a name and a company, return the company name).
+          2. identify the person or company that the invoice is coming from (ie. Gerard Howards, octagon legal group, etc. If you are given both a name and a company, return the company name). IF no information is provided, leave it blank.
           3. extract invoice number 
-          4. extract invoice date 
+          4. extract invoice date.
           5. extract name of the person or company the invoice is going to
           6. extract tax information 
           7. Display total cost 
+          8. decide which category this invoice falls under. The categories are as follows: {bill_categories}
           Each item will most likely be abberviated. 
           It's critical to accurately extract every item listed in the receipts without adding or omitting any details. Misinterpretation or addition of numbers is not acceptable.
           The output should be a cleanly formatted list, with each item and its price listed. Do not include any additional text or explanation outside of this structured format.
@@ -22,7 +25,8 @@ def process_bills(input):
             60 GB 24/7 data plan, 53.99
             2x 1GB data plan, 10.99 
             Disney+ year subscription, 129.99
-          Vendor: Fido Wireless Communications
+          Vendor: Fido Wireless Communications 
+          Category: Phone, Internet, TV
           Invoice number: 123456
           Invoice date: 2022-01-01
           Invoice due date: 2022-03-31

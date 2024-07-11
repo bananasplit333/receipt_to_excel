@@ -1,6 +1,8 @@
 from utilities.openai_client import client 
+from data_access.data_manager import get_receipt_categories
 
-def process_receipt(input, categories):
+def process_receipt(input):
+    categories = get_receipt_categories()
     message = [{
         "role": "system",
         "content": f"""

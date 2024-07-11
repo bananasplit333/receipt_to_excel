@@ -3,7 +3,6 @@ from processing import encode64, parse_receipt_to_json
 from processing.openai_vision import ocr_processing
 from processing.receipt_processing import process_receipt
 from processing.bill_processing import process_bills
-from data_access import get_topHeadings
 from utilities.openai_client import client
 # from groq import Groq
 import os 
@@ -30,8 +29,7 @@ def run(uploaded_file, temp_file_path, image_type):
       if (image_type == 'receipt'): 
         try:
           #processing receipt into expense format 
-          topHeadings = get_topHeadings()
-          msg = process_receipt(combined_text, topHeadings)
+          msg = process_receipt(combined_text)
           print(msg)
           return msg 
         except Exception as e:

@@ -5,7 +5,7 @@ image_paths = [
   "data/static/img/home_depot_1.jpg"
 ]
 
-topHeadings = [
+receipt_categories = [
   "Groceries & Food",
   "Clothing & Fashion",
   "Home & Living",
@@ -18,6 +18,26 @@ topHeadings = [
   "Crafts & Party Supplies",
   "Other"
 ]
+
+bill_categories =[
+    "Utility",
+    "Housing",
+    "Medical",
+    "Insurance",
+    "Transportation",
+    "Education",
+    "Finance",
+    "Business",
+    "Subscriptions",
+    "Government",
+    "Retail",
+    "Food",
+    "Legal",
+    "Travel & Leisure",
+    "Pet",
+    "Childcare",
+    "Phone, Internet, TV"
+] 
 
 sample_resp = """
 Groceries & Food
@@ -66,5 +86,8 @@ Clothing & Accessories
 Health & Beauty
 """
 
-def get_topHeadings():
-    return topHeadings
+def get_receipt_categories():
+    return receipt_categories
+
+def get_bill_categories():
+    return bill_categories
